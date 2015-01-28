@@ -10,8 +10,11 @@ public class Controller {
     public static void main(String[] args) throws Exception {
             String crawlStorageFolder = "/data/crawl/root";
             int numberOfCrawlers = 7;
+            
 
             CrawlConfig config = new CrawlConfig();
+            config.setPolitenessDelay(300);
+            config.setUserAgentString("UCI WebCrawler 57491291");
             config.setCrawlStorageFolder(crawlStorageFolder);
 
             /*
@@ -27,7 +30,7 @@ public class Controller {
              * URLs that are fetched and then the crawler starts following links
              * which are found in these pages
              */
-            controller.addSeed("http://vaishakh.me");
+            controller.addSeed("http://www.ics.uci.edu");
             //controller.addSeed("");
             //controller.addSeed("http://www.ics.uci.edu/");
 
