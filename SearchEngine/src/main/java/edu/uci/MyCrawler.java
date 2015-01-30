@@ -10,10 +10,11 @@ import java.util.regex.Pattern;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
+import edu.uci.ics.crawler4j.parser.ParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 public class MyCrawler extends WebCrawler {
-
+    private final static String File_Store_Path = "C:/data/parse/";
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g" 
                                                       + "|png|tiff?|mid|mp2|mp3|mp4"
                                                       + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
@@ -27,7 +28,10 @@ public class MyCrawler extends WebCrawler {
     @Override
     public boolean shouldVisit(WebURL url) {
             String href = url.getURL().toLowerCase();
-            return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar"));
+            return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar")) &&
+                    !(href.contains("archive.ics.uci.edu")) && !(href.contains("drzaius.ics.uci.edu"))&& !(href.contains("flamingo.ics.uci.edu")) &&
+                    !(href.contains("fano.ics.uci.edu")) &&  !(href.contains("ironwood.ics.uci.edu")) &&
+                    !(href.contains("duttgroup.ics.uci.edu"));
     }
 
     /**
@@ -39,13 +43,13 @@ public class MyCrawler extends WebCrawler {
             String url = page.getWebURL().getURL();
             System.out.println("URL: " + url);
 
-            if (page.getParseData() instanceof HtmlParseData) {
+            if (isHTMLParseData(page)) {
                     HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
                     String text = htmlParseData.getText();
                     String html = htmlParseData.getHtml();
                     List<WebURL> links = htmlParseData.getOutgoingUrls();
                     try {
-                    File f = File.createTempFile("parse", "data.txt", new File("C:/Users/VaishakhBaragur/data/"));
+                    File f = File.createTempFile("parse", "data.txt", new File(File_Store_Path));
 						PrintWriter out = new PrintWriter(f);
 						out.print(text);
 						out.close();
@@ -58,5 +62,9 @@ public class MyCrawler extends WebCrawler {
                     System.out.println("Html length: " + html.length());
                     System.out.println("Number of outgoing links: " + links.size());
             }
+    }
+
+    private boolean isHTMLParseData(Page page){
+        return page.getParseData() instanceof HtmlParseData;
     }
 }
