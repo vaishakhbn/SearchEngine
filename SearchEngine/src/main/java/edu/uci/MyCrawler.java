@@ -37,6 +37,7 @@ public class MyCrawler extends WebCrawler {
     /**
      * This function is called when a page is fetched and ready 
      * to be processed by your program.
+     * Extracts info from the retrieved web page.
      */
     @Override
     public void visit(Page page) {          
