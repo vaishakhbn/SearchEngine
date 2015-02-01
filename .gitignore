@@ -45,3 +45,5 @@ Temporary Items
 *.iml
 .idea/*
 .out/*
+*.classpath
+SearchEngine/.classpath
