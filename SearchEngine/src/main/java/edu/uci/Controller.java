@@ -14,7 +14,7 @@ public class Controller {
 
             CrawlConfig config = new CrawlConfig();
             config.setPolitenessDelay(300);
-            config.setUserAgentString("UCI WebCrawler 57491291");
+            config.setUserAgentString("UCI WebCrawler 57491291 41325543");
             config.setCrawlStorageFolder(crawlStorageFolder);
 //            config.setMaxDepthOfCrawling(1);
             /*

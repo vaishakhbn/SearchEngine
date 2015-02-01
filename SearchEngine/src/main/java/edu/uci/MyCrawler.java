@@ -58,12 +58,16 @@ public class MyCrawler extends WebCrawler {
                     String html = htmlParseData.getHtml();
                     List<WebURL> links = htmlParseData.getOutgoingUrls();
                     try {
-                    File f = File.createTempFile("parse", "data.txt", new File(File_Store_Path));
-						PrintWriter out = new PrintWriter(f);
+                    	
+                    	String fileName = url.replace("http://", "").replaceAll("/", ".").concat(".txt");
+                    	String fileNameWithMarkup = fileName.replace(".txt", ".html.txt");
+						PrintWriter outForHTML = new PrintWriter(new File("./data/HTMLFiles/"+fileNameWithMarkup));
+						outForHTML.print(html);
+						outForHTML.close();
+						PrintWriter out = new PrintWriter(new File("./data/TextFiles/"+fileName));
 						out.print(text);
 						out.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
                 PageDetails pageDetails = new PageDetails(url);

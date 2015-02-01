@@ -24,7 +24,6 @@ public class ToJSON {
     	{
     		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("/", ".").concat(".json");
     		mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
-    		System.out.println(mapper.writeValueAsString(pageDetails));
     	}
     	catch (JsonGenerationException e) 
     	{
