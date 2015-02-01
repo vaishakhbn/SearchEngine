@@ -47,3 +47,4 @@ Temporary Items
 .out/*
 *.classpath
 SearchEngine/.classpath
+*.json

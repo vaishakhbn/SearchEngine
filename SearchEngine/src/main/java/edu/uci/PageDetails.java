@@ -11,6 +11,10 @@ public class PageDetails {
     public PageDetails(String url) {
         this.url = url;
     }
+    public String getURL()
+    {
+    	return this.url;
+    }
 
     public String getText() {
         return text;
