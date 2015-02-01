@@ -49,6 +49,7 @@ public class MyCrawler extends WebCrawler {
     @Override
     public void visit(Page page) {          
             String url = page.getWebURL().getURL();
+            String subDomain = page.getWebURL().getSubDomain();
             System.out.println("URL: " + url);
 
             if (isHTMLParseData(page)) {
@@ -65,8 +66,12 @@ public class MyCrawler extends WebCrawler {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-                    
-                    System.out.println("Text length: " + text.length());
+                PageDetails pageDetails = new PageDetails(url);
+                pageDetails.setText(text);
+                pageDetails.setTextSize(text.length());
+                pageDetails.setSubDomain(subDomain);
+                ToJSON.getInstance().convert(pageDetails);
+                System.out.println("Text length: " + text.length());
                     System.out.println("Html length: " + html.length());
 //                    for(WebURL link  :links)
 //                        System.out.println(link);
