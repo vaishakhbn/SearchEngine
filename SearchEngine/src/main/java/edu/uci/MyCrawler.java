@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,13 @@ public class MyCrawler extends WebCrawler {
      */
     @Override
     public boolean shouldVisit(WebURL url) {
+            List<WebURL> visited = new ArrayList<WebURL>();
+            if(visited.contains(url)){
+                return false;
+            }
+            visited.add(url);
             String href = url.getURL().toLowerCase();
+
             return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar")) &&
                     !(href.contains("archive.ics.uci.edu")) && !(href.contains("drzaius.ics.uci.edu"))&& !(href.contains("flamingo.ics.uci.edu")) &&
                     !(href.contains("fano.ics.uci.edu")) &&  !(href.contains("ironwood.ics.uci.edu")) &&
@@ -61,6 +68,8 @@ public class MyCrawler extends WebCrawler {
                     
                     System.out.println("Text length: " + text.length());
                     System.out.println("Html length: " + html.length());
+                    for(WebURL link  :links)
+                        System.out.println(link);
                     System.out.println("Number of outgoing links: " + links.size());
             }
     }

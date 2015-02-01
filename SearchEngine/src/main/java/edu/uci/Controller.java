@@ -16,7 +16,7 @@ public class Controller {
             config.setPolitenessDelay(300);
             config.setUserAgentString("UCI WebCrawler 57491291");
             config.setCrawlStorageFolder(crawlStorageFolder);
-
+//            config.setMaxDepthOfCrawling(1);
             /*
              * Instantiate the controller for this crawl.
              */
@@ -29,13 +29,12 @@ public class Controller {
             }catch(RuntimeException rex){
                 rex.printStackTrace();
             }
-
             /*
              * For each crawl, you need to add some seed urls. These are the first
              * URLs that are fetched and then the crawler starts following links
              * which are found in these pages
              */
-            controller.addSeed("http://www.ics.uci.edu");
+            controller.addSeed("http://www.ics.uci.edu/");
             //controller.addSeed("");
             //controller.addSeed("http://www.ics.uci.edu/");
 
@@ -43,6 +42,8 @@ public class Controller {
              * Start the crawl. This is a blocking operation, meaning that your code
              * will reach the line after this only when crawling is finished.
              */
-            controller.start(MyCrawler.class, numberOfCrawlers);    
+            controller.start(MyCrawler.class, numberOfCrawlers);
+
+            System.out.println("Crawling finished");
     }
 }
