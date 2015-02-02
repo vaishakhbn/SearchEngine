@@ -2,9 +2,11 @@ package edu.uci;
 import java.io.File;
 import java.io.IOException;
 
+import com.mongodb.util.JSON;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import com.mongodb.*;
 /**
  * Created by swanand on 2/1/2015.
  */
@@ -23,7 +25,10 @@ public class ToJSON {
     	try 
     	{
     		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("/", ".").concat(".json");
-    		mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
+            Mongo mongo = new Mongo();
+            insertPage(mongo,pageDetails,mapper);
+            mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
+
     	}
     	catch (JsonGenerationException e) 
     	{
@@ -37,5 +42,11 @@ public class ToJSON {
     	{
     		e.printStackTrace();
     	}
+    }
+
+    private void insertPage(Mongo mongo, PageDetails pageDetails, ObjectMapper mapper) throws IOException {
+        DBCollection pages = mongo.getDB("webpages").getCollection("pages");
+        DBObject page = (DBObject) JSON.parse(mapper.writeValueAsString(pageDetails));
+        pages.insert(page);
     }
 }

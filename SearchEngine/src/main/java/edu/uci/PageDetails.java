@@ -5,9 +5,9 @@ package edu.uci;
  */
 public class PageDetails {
     private final String url;
-    private String text;
-    private int textSize;
     private String subDomain;
+    private int textSize;
+    private String text;
     public PageDetails(String url) {
         this.url = url;
     }
