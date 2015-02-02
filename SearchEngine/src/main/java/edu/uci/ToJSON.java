@@ -25,10 +25,9 @@ public class ToJSON {
     	try 
     	{
     		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("/", ".").concat(".json");
-            Mongo mongo = new Mongo();
+            Mongo mongo = MongoConnector.getInstance();
             insertPage(mongo,pageDetails,mapper);
             mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
-
     	}
     	catch (JsonGenerationException e) 
     	{
