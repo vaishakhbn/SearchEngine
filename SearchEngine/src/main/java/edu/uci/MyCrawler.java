@@ -19,7 +19,7 @@ public class MyCrawler extends WebCrawler {
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g" 
                                                       + "|png|tiff?|mid|mp2|mp3|mp4"
                                                       + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
-                                                      + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+                                                      + "|rm|smil|wmv|swf|wma|zip|rar|gz|xml))$");
 
     /**
      * You should implement this function to specify whether
@@ -34,11 +34,13 @@ public class MyCrawler extends WebCrawler {
             }
             visited.add(url);
             String href = url.getURL().toLowerCase();
+            return  !FILTERS.matcher(href).matches() && href.contains("vaishakh.me");
 
-            return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar")) &&
+           /* return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar")) &&
                     !(href.contains("archive.ics.uci.edu")) && !(href.contains("drzaius.ics.uci.edu"))&& !(href.contains("flamingo.ics.uci.edu")) &&
                     !(href.contains("fano.ics.uci.edu")) &&  !(href.contains("ironwood.ics.uci.edu")) &&
-                    !(href.contains("duttgroup.ics.uci.edu"));
+                    !(href.contains("duttgroup.ics.uci.edu")) && !href.contains("wics.ics.uci.edu");
+                    */
     }
 
     /**
@@ -59,7 +61,7 @@ public class MyCrawler extends WebCrawler {
                     List<WebURL> links = htmlParseData.getOutgoingUrls();
                     try {
                     	
-                    	String fileName = url.replace("http://", "").replaceAll("/", ".").concat(".txt");
+                    	String fileName = url.replace("http://", "").replaceAll("[^a-zA-Z0-9.-]", ".").concat(".txt");
                     	String fileNameWithMarkup = fileName.replace(".txt", ".html.txt");
 						PrintWriter outForHTML = new PrintWriter(new File("./data/HTMLFiles/"+fileNameWithMarkup));
 						outForHTML.print(html);

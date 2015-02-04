@@ -10,24 +10,29 @@ import com.mongodb.*;
 /**
  * Created by swanand on 2/1/2015.
  */
-public class ToJSON {
+public class ToJSON 
+{
     private static ToJSON toJSON = new ToJSON();
     private ToJSON(){
     }
-    public static ToJSON getInstance(){
-        if(toJSON == null){
+    public static ToJSON getInstance()
+    {
+        if(toJSON == null)
+        {
             return new ToJSON();
         }
         return toJSON;
     }
-    public void convert(PageDetails pageDetails) {
+    public void convert(PageDetails pageDetails) 
+    {
     	ObjectMapper mapper = new ObjectMapper();
     	try 
     	{
-    		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("/", ".").concat(".json");
+    		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("[^a-zA-Z0-9.-]", ".").concat(".json");
+            mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
             Mongo mongo = MongoConnector.getInstance();
             insertPage(mongo,pageDetails,mapper);
-            mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
+
     	}
     	catch (JsonGenerationException e) 
     	{
@@ -43,7 +48,8 @@ public class ToJSON {
     	}
     }
 
-    private void insertPage(Mongo mongo, PageDetails pageDetails, ObjectMapper mapper) throws IOException {
+    private void insertPage(Mongo mongo, PageDetails pageDetails, ObjectMapper mapper) throws IOException 
+    {
         DBCollection pages = mongo.getDB("webpages").getCollection("pages");
         DBObject page = (DBObject) JSON.parse(mapper.writeValueAsString(pageDetails));
         pages.insert(page);
