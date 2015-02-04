@@ -30,8 +30,8 @@ public class ToJSON
     	{
     		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("[^a-zA-Z0-9.-]", ".").concat(".json");
             mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
-            Mongo mongo = MongoConnector.getInstance();
-            insertPage(mongo,pageDetails,mapper);
+          //  Mongo mongo = MongoConnector.getInstance(); Nice to Have feature. 
+          //  insertPage(mongo,pageDetails,mapper);
 
     	}
     	catch (JsonGenerationException e) 
