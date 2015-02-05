@@ -34,13 +34,12 @@ public class MyCrawler extends WebCrawler {
             }
             visited.add(url);
             String href = url.getURL().toLowerCase();
-            return  !FILTERS.matcher(href).matches() && href.contains("vaishakh.me");
+            /*return  !FILTERS.matcher(href).matches() && href.contains("vaishakh.me");*/
 
-           /* return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar")) &&
+            return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar")) &&
                     !(href.contains("archive.ics.uci.edu")) && !(href.contains("drzaius.ics.uci.edu"))&& !(href.contains("flamingo.ics.uci.edu")) &&
                     !(href.contains("fano.ics.uci.edu")) &&  !(href.contains("ironwood.ics.uci.edu")) &&
                     !(href.contains("duttgroup.ics.uci.edu")) && !href.contains("wics.ics.uci.edu");
-                    */
     }
 
     /**
