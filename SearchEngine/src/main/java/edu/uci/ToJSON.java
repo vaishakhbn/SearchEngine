@@ -2,11 +2,11 @@ package edu.uci;
 import java.io.File;
 import java.io.IOException;
 
-import com.mongodb.util.JSON;
+//import com.mongodb.util.JSON;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import com.mongodb.*;
+//import com.mongodb.*;
 /**
  * Created by swanand on 2/1/2015.
  */
@@ -28,7 +28,7 @@ public class ToJSON
     	ObjectMapper mapper = new ObjectMapper();
     	try 
     	{
-    		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("[^a-zA-Z0-9.-]", ".").concat(".json");
+    		String fileName = pageDetails.getURL().replace("http://", "").replaceAll("[^a-zA-Z0-9.-]", "").concat(".json");
             mapper.writeValue(new File("./data/JSONs/"+fileName), pageDetails);
           //  Mongo mongo = MongoConnector.getInstance(); Nice to Have feature. 
           //  insertPage(mongo,pageDetails,mapper);
@@ -48,10 +48,10 @@ public class ToJSON
     	}
     }
 
-    private void insertPage(Mongo mongo, PageDetails pageDetails, ObjectMapper mapper) throws IOException 
+  /*  private void insertPage(Mongo mongo, PageDetails pageDetails, ObjectMapper mapper) throws IOException 
     {
         DBCollection pages = mongo.getDB("webpages").getCollection("pages");
         DBObject page = (DBObject) JSON.parse(mapper.writeValueAsString(pageDetails));
         pages.insert(page);
-    }
+    }*/
 }

@@ -1,12 +1,12 @@
-package edu.uci;
+/*package edu.uci;
 
 import com.mongodb.Mongo;
 
 import java.net.UnknownHostException;
 
-/**
+*//**
  * Created by swanand on 2/1/2015.
- */
+ *//*
 public class MongoConnector {
     private static Mongo mongo;
     private MongoConnector() throws UnknownHostException {
@@ -19,3 +19,4 @@ public class MongoConnector {
         return mongo;
     }
 }
+*/
