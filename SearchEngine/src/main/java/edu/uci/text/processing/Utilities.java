@@ -4,19 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.StringTokenizer;
+
 public final class Utilities
 {
 	private static Scanner in;
@@ -31,12 +21,12 @@ public final class Utilities
 			while(in.hasNextLine())
 			{
 				inp = in.nextLine();
-				String alphaNumericOnly = inp.replaceAll("[^a-zA-Z0-9]+"," ");
+				String alphaNumericOnly = inp.replaceAll("[^a-zA-Z]+"," ");
 				StringTokenizer st = new StringTokenizer(alphaNumericOnly);
 				while(st.hasMoreTokens())
 				{
 					String a = st.nextToken();
-					if(!(a.equalsIgnoreCase(" ")))
+					if(!(a.equalsIgnoreCase(" ")) && a.length() >1 )
 					{
 						input.add(new Token(a.toLowerCase()));
 					}
@@ -91,28 +81,37 @@ public final class Utilities
 	    }
 	}
 
-	@SuppressWarnings("hiding")
-	public static <String, Integer extends Comparable<? super Integer>> LinkedHashMap<String, Integer> 
+
+    @SuppressWarnings("hiding")
+    public static <String, Integer extends Comparable<? super Integer>> LinkedHashMap<String, Integer>
     sortByValue( LinkedHashMap<String, Integer> map )
     {
-		List<Entry<String, Integer>> list =
-				new LinkedList<>( map.entrySet() );
-		Collections.sort( list, new Comparator<Entry<String, Integer>>()
-		{
-			@Override
-			public int compare( Entry<String, Integer> o1, Entry<String, Integer> o2 )
-			{
-				return (o2.getValue()).compareTo( o1.getValue() );
-			}
-		} );
+        List<Map.Entry<String, Integer>> list =
+                new LinkedList<>( map.entrySet() );
+        Collections.sort( list, new Comparator<Map.Entry<String, Integer>>()
+        {
+            @Override
+            public int compare( Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2 )
+            {
+                return (o2.getValue()).compareTo( o1.getValue() );
+            }
+        } );
 
-		LinkedHashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
-		for (Entry<String, Integer> entry : list)
-		{
-			result.put( entry.getKey(), entry.getValue() );
-		}
-		return result;
+        LinkedHashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
+        for (Map.Entry<String, Integer> entry : list)
+        {
+            result.put( entry.getKey(), entry.getValue() );
+        }
+        return result;
     }
+
+
+
+
+
+
+
+
 	public static List<Token> convertListToToken(List<String> tokenStringList)
 	{
 		List<Token> tokens = new ArrayList<Token>();
