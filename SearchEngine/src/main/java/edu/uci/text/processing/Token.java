@@ -36,6 +36,8 @@ public class Token implements java.io.Serializable
 		return token;
 	}
 
+    public int getTokenLength(){return token.length();}
+
 	public void setToken(String token)
 	{
 		this.token = token;

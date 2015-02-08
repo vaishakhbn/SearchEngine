@@ -21,12 +21,12 @@ public final class Utilities
 			while(in.hasNextLine())
 			{
 				inp = in.nextLine();
-				String alphaNumericOnly = inp.replaceAll("[^a-zA-Z]+"," ");
+				String alphaNumericOnly = inp.replaceAll("[^a-zA-Z0-9]+"," ");
 				StringTokenizer st = new StringTokenizer(alphaNumericOnly);
 				while(st.hasMoreTokens())
 				{
 					String a = st.nextToken();
-					if(!(a.equalsIgnoreCase(" ")) && a.length() >1 )
+					if(!(a.equalsIgnoreCase(" ")))
 					{
 						input.add(new Token(a.toLowerCase()));
 					}

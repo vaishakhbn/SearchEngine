@@ -4,6 +4,8 @@ package edu.uci;
 import edu.uci.text.processing.Token;
 import edu.uci.text.processing.TwoGram;
 import edu.uci.text.processing.Utilities;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -16,7 +18,7 @@ import java.util.*;
  * Created by swanand on 2/4/2015.
  */
 public class WordProcessor {
-    public static final String TEXT_DIR_PATH = "./data/TextFiles/";
+    public static final String TEXT_DIR_PATH =  "./data/TextFiles/";
     public static final String STOP_FILE = "./stopwords.txt";
     public static LinkedHashMap<String,Integer> wordFreq = new LinkedHashMap<String, Integer>();
     public static LinkedHashMap<TwoGram, Integer> twoGramsFreq = new LinkedHashMap<TwoGram, Integer>();
@@ -33,7 +35,17 @@ public class WordProcessor {
                      maxTokens = tokenSize;
                      longestFile = filename;
                  }
-                manageTwoGrams(tokens,stopwords,twoGramsFreq);
+
+                CollectionUtils.filter(tokens, new Predicate<Token>() {
+                    @Override
+                    public boolean evaluate(Token token) {
+                        if(token.getTokenLength() < 2){
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+                manageTwoGrams(tokens, stopwords, twoGramsFreq);
                 tokens.removeAll(stopwords);
                 maintainFrequency(tokens);
 
