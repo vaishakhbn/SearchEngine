@@ -40,4 +40,21 @@ public class StemmedTerm {
     public void setFrequency(int frequency) {
         this.frequency = frequency;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StemmedTerm that = (StemmedTerm) o;
+
+        if (stem != null ? !stem.equals(that.stem) : that.stem != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return stem != null ? stem.hashCode() : 0;
+    }
 }
