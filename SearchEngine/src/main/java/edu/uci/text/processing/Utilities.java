@@ -1,4 +1,6 @@
 package edu.uci.text.processing;
+import edu.uci.index.StemmedTerm;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,20 +38,20 @@ public final class Utilities
 		}
 		
 	
-	public static LinkedHashMap<String, Integer> computeWordFrequencies(List<Token> token)
+	public static LinkedHashMap<String, Integer> computeWordFrequencies(List token)
 	{
 		LinkedHashSet<String> uniqueTokens = new LinkedHashSet<String>();
-		
-		
+
+
 		ArrayList<String> tokens = new ArrayList<String>();
-		for (Token t  : token) 
+		for (Token t  : (List<Token>)token)
 		{
 			uniqueTokens.add(t.getToken());
 			tokens.add(t.getToken());
 		}
 		Iterator<String> iter = uniqueTokens.iterator();
 		LinkedHashMap<String, Integer> t = new LinkedHashMap<String, Integer>();
-		while (iter.hasNext()) 
+		while (iter.hasNext())
 		{
 			String a = iter.next();
 			int occurrences = Collections.frequency(tokens, a);
@@ -57,6 +59,28 @@ public final class Utilities
 		}
 		return t;
 	}
+
+    public static LinkedHashMap<String, Integer> computeStemFrequencies(List<StemmedTerm> stemTokens)
+    {
+        List<String> tokens = Utilities.convertStemToStringToks(stemTokens);
+        LinkedHashSet<String> uniqueTokens = new LinkedHashSet<String>();
+
+
+        for (String t  : tokens)
+        {
+            uniqueTokens.add(t);
+        }
+        Iterator<String> iter = uniqueTokens.iterator();
+        LinkedHashMap<String, Integer> t = new LinkedHashMap<String, Integer>();
+        while (iter.hasNext())
+        {
+            String a = iter.next();
+            int occurrences = Collections.frequency(tokens, a);
+            t.put(a,occurrences);
+        }
+        return t;
+    }
+
 	public static List<String> convertTokenObjectToList(List<Token> token)
 	{
 		List<String> tokens = new ArrayList<String>();
@@ -139,6 +163,14 @@ public final class Utilities
             isNotEmpty = false;
         }
         return isNotEmpty && isTxtFile;
+    }
+
+    public static List<String> convertStemToStringToks(List<StemmedTerm> stemTokens) {
+        List<String>strToks = new ArrayList<>();
+        for(StemmedTerm stem : stemTokens){
+            strToks.add(stem.getStem());
+        }
+        return strToks;
     }
 }
 

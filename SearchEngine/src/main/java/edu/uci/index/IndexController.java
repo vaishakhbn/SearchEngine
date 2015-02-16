@@ -22,12 +22,9 @@ public class IndexController {
             List<Token> tokens = Utilities.tokenizeFile(file);
             List<StemmedTerm> stemmedTerms = stemTokens(Utilities.convertToTokenList(tokens), file);
             indexConstructor.construct(stemmedTerms);
-
         }
-
         indexConstructor.flush();
         System.out.println("Over with Indices for now");
-
     }
 
     private static List<StemmedTerm> stemTokens(List<String> tokens, String fileId) {
