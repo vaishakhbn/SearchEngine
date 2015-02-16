@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InMemoryIndex{
+public class InMemoryIndexSpecs {
     public static final String TEXT_DIR_PATH =  "../data/TextFiles/";
 	@Test
 	public void shouldCreateAnIndex() throws IOException {

@@ -131,16 +131,15 @@ public final class Utilities
 		}
 		return tokens;
 	}
-	public static boolean isValidFileType(String inputFile) throws IOException
-	{
-		boolean isNotEmpty = true;
-		 boolean isTxtFile = inputFile.toLowerCase().endsWith(".txt");
-		 BufferedReader br = new BufferedReader(new FileReader(inputFile));     
-		 if (br.readLine() == null) {
-			 isNotEmpty = false;
-		 }
-		 return isNotEmpty&&isTxtFile;
-	}
+	public static boolean isValidFileType(String inputFile) throws IOException {
+        boolean isNotEmpty = true;
+        boolean isTxtFile = inputFile.toLowerCase().endsWith(".txt");
+        BufferedReader br = new BufferedReader(new FileReader(inputFile));
+        if (br.readLine() == null) {
+            isNotEmpty = false;
+        }
+        return isNotEmpty && isTxtFile;
+    }
 }
 
 
