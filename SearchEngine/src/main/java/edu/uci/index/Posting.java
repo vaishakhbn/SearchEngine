@@ -1,12 +1,15 @@
 package edu.uci.index;
 
+import com.mongodb.BasicDBObject;
+
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by swanand on 2/14/2015.
+
  */
-public class Posting implements Serializable {
+public class Posting implements Serializable  {
     private final String docId;
     private final List<Integer> positions;
     private Float tf = new Float(0.0);
@@ -50,5 +53,17 @@ public class Posting implements Serializable {
         if(idf != 0.0)
         return tf * Math.log(idf.doubleValue());
         else return 0;
+    }
+
+    public List<Integer> getPositions() {
+        return positions;
+    }
+
+    public String getDocId() {
+        return docId;
+    }
+
+    public Float getIdf() {
+        return idf;
     }
 }

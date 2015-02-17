@@ -17,14 +17,15 @@ import java.util.List;
 public class IndexController {
     public static void main (String[] args) throws IOException {
         IndexConstructor indexConstructor = new IndexConstructor();
-        List<String>filenames = getFileListFrom("../testData/");
+        List<String>filenames = getFileListFrom("../../data/TextFiles/");
         for(String file: filenames){
             List<Token> tokens = Utilities.tokenizeFile(file);
             List<StemmedTerm> stemmedTerms = stemTokens(Utilities.convertToTokenList(tokens), file);
             indexConstructor.construct(stemmedTerms);
         }
         indexConstructor.addIDF(filenames.size());
-        //@TODO Sorting
+        indexConstructor.sortIndex();
+        //@TODO: Compression <Can use util.Zip>
         indexConstructor.flush();
         System.out.println("Over with Indices for now");
     }
