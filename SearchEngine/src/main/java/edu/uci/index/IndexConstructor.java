@@ -1,6 +1,8 @@
 package edu.uci.index;
 
 import edu.uci.text.processing.Utilities;
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +26,6 @@ public class IndexConstructor {
         LinkedHashMap<String, Integer> stemFrequencies = Utilities.computeStemFrequencies(stemTokens);
         int totalTerms = stemTokens.size();
         for(StemmedTerm stem : stemTokens){
-            List<Posting> postings;
             String stemTerm = stem.getStem();
 
             if(partialIndex.containsKey(stemTerm)){
@@ -34,13 +35,13 @@ public class IndexConstructor {
                     posts.add(post);
                 }
             }else{
-                postings = new ArrayList<>();
+                List<Posting> postings = new ArrayList<>();
                 Posting posting = buildPostingFor(stem,stemFrequencies,totalTerms);
                 postings.add(posting);
                 partialIndex.put(stem.getStem(),postings);
             }
-
         }
+
         System.out.println("In Construction: " + partialIndex.keySet().size());
     }
 
@@ -67,5 +68,24 @@ public class IndexConstructor {
         }
 
 
+    }
+
+    public void addIDF(final int totalSize) {
+        Collection<List<Posting>> allPostings = partialIndex.values();
+        CollectionUtils.forAllDo(allPostings,new Closure(){
+
+            @Override
+            public void execute(Object postings) {
+                List<Posting> posts = (List<Posting>) postings;
+                final float idf = (float) totalSize/posts.size();
+                CollectionUtils.forAllDo(posts,new Closure(){
+                    @Override
+                    public void execute(Object post) {
+                        Posting posting = (Posting) post;
+                        posting.setIdf(idf);
+                    }
+                });
+            }
+        });
     }
 }

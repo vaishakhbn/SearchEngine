@@ -10,7 +10,7 @@ public class Posting implements Serializable {
     private final String docId;
     private final List<Integer> positions;
     private Float tf = new Float(0.0);
-
+    private Float idf = new Float(0.0);
     public Posting(String docId, List<Integer> positions) {
         this.docId = docId;
         this.positions = positions;
@@ -40,5 +40,15 @@ public class Posting implements Serializable {
 
     public void setTf(Float tf) {
         this.tf = tf;
+    }
+
+    public void setIdf(Float idf) {
+        this.idf = idf;
+    }
+
+    public double get_TF_IDF(){
+        if(idf != 0.0)
+        return tf * Math.log(idf.doubleValue());
+        else return 0;
     }
 }
