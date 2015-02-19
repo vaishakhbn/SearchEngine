@@ -38,13 +38,13 @@ public final class Utilities
 		}
 		
 	
-	public static LinkedHashMap<String, Integer> computeWordFrequencies(List token)
+	public static LinkedHashMap<String, Integer> computeWordFrequencies(List<Token> token)
 	{
 		LinkedHashSet<String> uniqueTokens = new LinkedHashSet<String>();
 
 
 		ArrayList<String> tokens = new ArrayList<String>();
-		for (Token t  : (List<Token>)token)
+		for (Token t  : token)
 		{
 			uniqueTokens.add(t.getToken());
 			tokens.add(t.getToken());

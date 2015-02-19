@@ -1,5 +1,6 @@
 package edu.uci.index;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
 public class StemmedTerm {
     private String docId;
     private String stem;
-    private List<Integer> positions;
+    private List<Integer> positions = new ArrayList<Integer>();
     private int frequency;
 
     public StemmedTerm(String docId, String stem) {

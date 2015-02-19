@@ -18,10 +18,14 @@ public class IndexController {
     public static void main (String[] args) throws IOException {
         IndexConstructor indexConstructor = new IndexConstructor();
         List<String>filenames = getFileListFrom("../../data/TextFiles/");
+//        List<String>filenames = getFileListFrom("../testData/");
         for(String file: filenames){
             List<Token> tokens = Utilities.tokenizeFile(file);
-            List<StemmedTerm> stemmedTerms = stemTokens(Utilities.convertToTokenList(tokens), file);
-            indexConstructor.construct(stemmedTerms);
+            List<String> tokenStrs =  Utilities.convertToTokenList(tokens);
+            //Get stemmed tokens: All with duplicates.
+            List<StemmedTerm> allStemmedTerms = stem(tokenStrs,file);
+            List<StemmedTerm> stemmedTerms = stemTokens(allStemmedTerms);
+            indexConstructor.construct(stemmedTerms,allStemmedTerms);
         }
         indexConstructor.addIDF(filenames.size());
         indexConstructor.sortIndex();
@@ -30,12 +34,30 @@ public class IndexController {
         System.out.println("Over with Indices for now");
     }
 
-    private static List<StemmedTerm> stemTokens(List<String> tokens, String fileId) {
-        List<StemmedTerm>stemToks = new ArrayList<StemmedTerm>();
-       // @TODO: Stemmers Algorithm. Will Return a stemmed term/list of stemmed terms.
-        for(String strTok: tokens){
-           stemToks.add(new StemmedTerm(fileId,strTok));
+    private static List<StemmedTerm> stem(List<String> tokenStrs, String fileId) {
+        List<StemmedTerm> allStemWords=new ArrayList<>();
+        Porter porterStemmer = new Porter();
+        for(String tok: tokenStrs){
+            String stem = porterStemmer.stripAffixes(tok);
+            allStemWords.add(new StemmedTerm(fileId,stem));
         }
+        return allStemWords;
+    }
+
+    private static List<StemmedTerm> stemTokens(List<StemmedTerm> stemTtokens) {
+        List<StemmedTerm>stemToks = new ArrayList<StemmedTerm>();
+        int count=0;
+        for(StemmedTerm stemTerm: stemTtokens){
+            if(stemToks.contains(stemTerm)){
+                StemmedTerm st = stemToks.get(stemToks.indexOf(stemTerm));
+                st.getPositions().add(count);
+            }else{
+                stemTerm.getPositions().add(count);
+                stemToks.add(stemTerm);
+            }
+            count++;
+        }
+
         return stemToks;
     }
 

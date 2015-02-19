@@ -3,6 +3,7 @@ package edu.uci.index;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.uci.MongoConnector;
+import edu.uci.text.processing.Token;
 import edu.uci.text.processing.Utilities;
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,13 +31,12 @@ public class IndexConstructor {
         this.partialIndex = new HashMap<>();
     }
 
-    public void construct(List<StemmedTerm> stemTokens) {
+    public void construct(List<StemmedTerm> stemTokens, List<StemmedTerm> allTokens) {
 
-        LinkedHashMap<String, Integer> stemFrequencies = Utilities.computeStemFrequencies(stemTokens);
-        int totalTerms = stemTokens.size();
+        LinkedHashMap<String, Integer> stemFrequencies = Utilities.computeStemFrequencies(allTokens);
+        int totalTerms = allTokens.size();
         for (StemmedTerm stem : stemTokens) {
             String stemTerm = stem.getStem();
-
             if (partialIndex.containsKey(stemTerm)) {
                 List<Posting> posts = partialIndex.get(stemTerm);
                 Posting post = buildPostingFor(stem, stemFrequencies, totalTerms);
@@ -58,27 +58,29 @@ public class IndexConstructor {
         float tf = (float) stemFrequencies.get(stem.getStem()) / totalTerms;
         Posting posting = new Posting(stem.getDocId(), stem.getPositions());
         posting.setTf(tf);
+
         return posting;
     }
 
     public void flush() throws IOException {
         //@TODO: Write the index to file
         flushToMongo();
-        try {
-            FileOutputStream fos = new FileOutputStream("index.txt");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(partialIndex);
-            oos.close();
-            fos.close();
-            System.out.printf("Serialized HashMap data is saved in hashmap.ser");
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+//        try {
+//            FileOutputStream fos = new FileOutputStream("index.txt");
+//            ObjectOutputStream oos = new ObjectOutputStream(fos);
+//            oos.writeObject(partialIndex);
+//            oos.close();
+//            fos.close();
+//            System.out.printf("Serialized HashMap data is saved in hashmap.ser");
+//        } catch (IOException ioe) {
+//            ioe.printStackTrace();
+//        }
     }
 
     private void flushToMongo() throws IOException {
         Mongo mongo = MongoConnector.getInstance();
         DB icsIndex = mongo.getDB("IcsIndex");
+        icsIndex.dropDatabase();
         DBCollection tfidf = icsIndex.getCollection("tfidf");
         Collection<List<Posting>> allPosts = partialIndex.values();
         JSONArray jsonArray = new JSONArray();
