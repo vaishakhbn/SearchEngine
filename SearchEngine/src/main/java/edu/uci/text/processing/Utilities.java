@@ -1,5 +1,8 @@
 package edu.uci.text.processing;
 import edu.uci.index.StemmedTerm;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,7 +38,24 @@ public final class Utilities
 				}
 			}
 			return input;
-		}
+	}
+
+    public static List<String> tokenizeText(String inp) throws IOException, ParseException {
+
+        List<Token> input = new ArrayList<Token>();
+        String alphaNumericOnly = inp.replaceAll("[^a-zA-Z0-9]+"," ");
+        StringTokenizer st = new StringTokenizer(alphaNumericOnly);
+        while(st.hasMoreTokens())
+        {
+            String a = st.nextToken();
+            if(!(a.equalsIgnoreCase(" ")))
+            {
+                input.add(new Token(a.toLowerCase()));
+            }
+        }
+        return Utilities.convertToTokenList(input);
+    }
+
 		
 	
 	public static LinkedHashMap<String, Integer> computeWordFrequencies(List<Token> token)

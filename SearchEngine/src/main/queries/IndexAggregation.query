@@ -1,0 +1,15 @@
+/*Agregating Inverted Index*/
+
+db.tfidf.aggregate(
+[
+	{$group : { _id : "$term",postings: { $push: "$postings" } } },
+	{$unwind : "$postings"},
+	{$unwind : "$postings"},
+	{$group : {_id : "$_id",postings: {$addToSet : "$postings"}}},
+	{$sort : {_id : 1 } },
+	{$out: "tfidfaggr"}
+],
+{
+	allowDiskUse : true
+}
+)

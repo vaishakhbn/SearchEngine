@@ -1,8 +1,11 @@
 package edu.uci.index;
 
-import edu.uci.text.processing.Token;
 import edu.uci.text.processing.Utilities;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -15,23 +18,37 @@ import java.util.List;
  * Created by swanand on 2/15/2015.
  */
 public class IndexController {
-    public static void main (String[] args) throws IOException {
+    public static void main (String[] args) throws IOException, ParseException {
         IndexConstructor indexConstructor = new IndexConstructor();
-        List<String>filenames = getFileListFrom("../../data/TextFiles/");
+
+
+        List<String>filenames = getFileListFrom("../../data/JSONs/");
+        int size = filenames.size();
+//        List<String> fileList1 = filenames.subList(0, size / 5);
+//        List<String> fileList2 = filenames.subList(size / 5, (2 * size / 5));
+//        List<String> fileList3 = filenames.subList((2 * size / 5),(3 * size / 5));
+//        List<String> fileList4 = filenames.subList((3 * size / 5), (4 * size / 5));
+//        List<String> fileList5 = filenames.subList((4 * size / 5), size);
+//        List<String>filenames = getFileListFrom("../../data/TextFiles/");
 //        List<String>filenames = getFileListFrom("../testData/");
+        JSONParser parser = new JSONParser();
         for(String file: filenames){
-            List<Token> tokens = Utilities.tokenizeFile(file);
-            List<String> tokenStrs =  Utilities.convertToTokenList(tokens);
+            JSONObject parse = (JSONObject)parser.parse(new FileReader(file));
+            String inp = parse.get("text").toString();
+            String url = parse.get("url").toString();
+            List<String> tokenStrs = Utilities.tokenizeText(inp);
             //Get stemmed tokens: All with duplicates.
-            List<StemmedTerm> allStemmedTerms = stem(tokenStrs,file);
+            List<StemmedTerm> allStemmedTerms = stem(tokenStrs,url);
             List<StemmedTerm> stemmedTerms = stemTokens(allStemmedTerms);
             indexConstructor.construct(stemmedTerms,allStemmedTerms);
+            //Clearing Data Structures
+            parse.clear();
+            allStemmedTerms.clear();
+            stemmedTerms.clear();
+            tokenStrs.clear();
         }
-        indexConstructor.addIDF(filenames.size());
-        indexConstructor.sortIndex();
-        //@TODO: Compression <Can use util.Zip>
-        indexConstructor.flush();
-        System.out.println("Over with Indices for now");
+       indexConstructor.flush();
+       System.out.println("Over with Indices for now");
     }
 
     private static List<StemmedTerm> stem(List<String> tokenStrs, String fileId) {

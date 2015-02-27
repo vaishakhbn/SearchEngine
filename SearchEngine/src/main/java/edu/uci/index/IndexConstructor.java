@@ -3,22 +3,15 @@ package edu.uci.index;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import edu.uci.MongoConnector;
-import edu.uci.text.processing.Token;
 import edu.uci.text.processing.Utilities;
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.UnknownHostException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -26,13 +19,18 @@ import java.util.*;
  */
 public class IndexConstructor {
     private Map<String, List<Posting>> partialIndex;
+    private Mongo mongo;
+    private DB icsIndex;
+    private DBCollection tfidf;
 
-    public IndexConstructor() {
+    public IndexConstructor() throws UnknownHostException {
+        Mongo mongo = MongoConnector.getInstance();
+        icsIndex = mongo.getDB("Icsmr");
+        tfidf = icsIndex.getCollection("tfidf");
         this.partialIndex = new HashMap<>();
-    }
+   }
 
-    public void construct(List<StemmedTerm> stemTokens, List<StemmedTerm> allTokens) {
-
+    public void construct(List<StemmedTerm> stemTokens, List<StemmedTerm> allTokens) throws IOException {
         LinkedHashMap<String, Integer> stemFrequencies = Utilities.computeStemFrequencies(allTokens);
         int totalTerms = allTokens.size();
         for (StemmedTerm stem : stemTokens) {
@@ -50,12 +48,16 @@ public class IndexConstructor {
                 partialIndex.put(stem.getStem(), postings);
             }
         }
-
         System.out.println("In Construction: " + partialIndex.keySet().size());
+        stemFrequencies.clear();
+        if(partialIndex.keySet().size() > 50000){
+            flush();
+            partialIndex.clear();
+        }
     }
 
     private Posting buildPostingFor(StemmedTerm stem, LinkedHashMap<String, Integer> stemFrequencies, int totalTerms) {
-        float tf = (float) stemFrequencies.get(stem.getStem()) / totalTerms;
+        float tf = (float) (1 + Math.log10(stemFrequencies.get(stem.getStem())));
         Posting posting = new Posting(stem.getDocId(), stem.getPositions());
         posting.setTf(tf);
 
@@ -64,7 +66,12 @@ public class IndexConstructor {
 
     public void flush() throws IOException {
         //@TODO: Write the index to file
-        flushToMongo();
+        if(!partialIndex.isEmpty()){
+            flushToMongo();
+        }
+        else{
+            System.out.println("Index done");
+        }
 //        try {
 //            FileOutputStream fos = new FileOutputStream("index.txt");
 //            ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -78,13 +85,10 @@ public class IndexConstructor {
     }
 
     private void flushToMongo() throws IOException {
-        Mongo mongo = MongoConnector.getInstance();
-        DB icsIndex = mongo.getDB("IcsIndex");
-        icsIndex.dropDatabase();
-        DBCollection tfidf = icsIndex.getCollection("tfidf");
+
         Collection<List<Posting>> allPosts = partialIndex.values();
         JSONArray jsonArray = new JSONArray();
-        for(Map.Entry<String,List<Posting>> entry:partialIndex.entrySet()){
+        for(Map.Entry<String,List<Posting>> entry: partialIndex.entrySet()){
             BasicDBObject term = new BasicDBObject().append("term", entry.getKey());
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String json = ow.writeValueAsString(entry.getValue());
@@ -94,27 +98,27 @@ public class IndexConstructor {
         }
     }
 
-    public void addIDF(final int totalSize) {
-        Collection<List<Posting>> allPostings = partialIndex.values();
-        CollectionUtils.forAllDo(allPostings, new Closure() {
+//    public void addIDF(final int totalSize) {
+//        Collection<List<Posting>> allPostings = partialIndex.values();
+//        CollectionUtils.forAllDo(allPostings, new Closure() {
+//
+//            @Override
+//            public void execute(Object postings) {
+//                List<Posting> posts = (List<Posting>) postings;
+//                final float idf = (float) totalSize / posts.size();
+//                CollectionUtils.forAllDo(posts, new Closure() {
+//                    @Override
+//                    public void execute(Object post) {
+//                        Posting posting = (Posting) post;
+//                        posting.setIdf(idf);
+//                    }
+//                });
+//            }
+//        });
+//    }
 
-            @Override
-            public void execute(Object postings) {
-                List<Posting> posts = (List<Posting>) postings;
-                final float idf = (float) totalSize / posts.size();
-                CollectionUtils.forAllDo(posts, new Closure() {
-                    @Override
-                    public void execute(Object post) {
-                        Posting posting = (Posting) post;
-                        posting.setIdf(idf);
-                    }
-                });
-            }
-        });
-    }
-
-    public void sortIndex() {
-        Map<String, List<Posting>> sortedMap = new TreeMap<String, List<Posting>>(partialIndex);
-        partialIndex = sortedMap;
-    }
+//    public void sortIndex() {
+//        Map<String, List<Posting>> sortedMap = new TreeMap<String, List<Posting>>(partialIndex);
+//        partialIndex = sortedMap;
+//    }
 }
