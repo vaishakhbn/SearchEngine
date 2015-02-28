@@ -10,8 +10,8 @@ import java.util.List;
 
  */
 public class Posting implements Serializable  {
-    private final String docId;
-    private final List<Integer> positions;
+    private String docId;
+    private List<Integer> positions;
     private Float tf = new Float(0.0);
     private Float idf = new Float(0.0);
     public Posting(String docId, List<Integer> positions) {
@@ -19,7 +19,19 @@ public class Posting implements Serializable  {
         this.positions = positions;
     }
 
-    @Override
+    public void setDocId(String docId) {
+		this.docId = docId;
+	}
+
+	public void setPositions(List<Integer> positions) {
+		this.positions = positions;
+	}
+
+	public Posting() {
+
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -65,5 +77,11 @@ public class Posting implements Serializable  {
 
     public Float getIdf() {
         return idf;
+    }
+    @Override
+    public String toString()
+    {
+		return docId;
+    	
     }
 }
