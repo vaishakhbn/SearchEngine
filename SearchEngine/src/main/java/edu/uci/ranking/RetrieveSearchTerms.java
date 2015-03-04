@@ -16,34 +16,36 @@ import edu.uci.index.Porter;
 public class RetrieveSearchTerms {
 	public static void main(String args[]) throws UnknownHostException
 	{
-		if(args.length<1)
-		{
-			System.out.println("Query format : ");
-		}
-		StringBuffer result = new StringBuffer();
-		for (int i = 0; i < args.length; i++) {
-		   result.append( args[i]+" ");
-		}
-		String query = result.toString();
-		Porter p = new Porter();
-		
-		StringTokenizer st = new StringTokenizer(query);
-		ArrayList<DBObject> dbObject = new ArrayList<DBObject>();
-		ArrayList<String> stemmedTerms = new ArrayList<String>();
-		while(st.hasMoreElements())
-		{
-			
-			stemmedTerms.add(p.stripAffixes(st.nextToken()));
-		}
-		queryTerm(stemmedTerms);
-
-				
+        //retrieveResults(args);
 	}
 
-	private static void queryTerm(ArrayList<String> stemmedTerms) throws UnknownHostException 
+    public List<String> retrieveResults(String[] args) throws UnknownHostException {
+        if(args.length<1)
+        {
+            System.out.println("Query format : ");
+        }
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < args.length; i++) {
+            result.append( args[i]+" ");
+        }
+        String query = result.toString();
+        Porter p = new Porter();
+
+        StringTokenizer st = new StringTokenizer(query);
+        ArrayList<DBObject> dbObject = new ArrayList<DBObject>();
+        ArrayList<String> stemmedTerms = new ArrayList<String>();
+        while(st.hasMoreElements())
+        {
+            stemmedTerms.add(p.stripAffixes(st.nextToken()));
+        }
+        return queryTerm(stemmedTerms);
+
+    }
+
+    private List<String> queryTerm(ArrayList<String> stemmedTerms) throws UnknownHostException
 	{
 		MongoClient mongo = new MongoClient("localhost");
-		DB db = mongo.getDB("IcsmrFinal");
+		DB db = mongo.getDB("Icsmr");
 		DBCollection table = db.getCollection("tfidfaggr");
 		DBObject match = new BasicDBObject("$match", new BasicDBObject("_id", new BasicDBObject("$in",stemmedTerms.toArray())));
 		DBObject unwind = new BasicDBObject("$unwind", "$postings" );
@@ -62,11 +64,17 @@ public class RetrieveSearchTerms {
 		DBObject limit = new BasicDBObject("$limit",5);
 		List<DBObject> pipeline = Arrays.asList(match, unwind, project, group, sort,limit);
 		AggregationOutput output = table.aggregate(pipeline);
+        List<String> top5 = new ArrayList<String>();
 		for (DBObject result : output.results()) {
 		    System.out.println(result);
+            String url = String.valueOf(result.get("_id"));
+            if(url.charAt(url.length()-1) == '/'){
+                url =url.substring(0,url.length()-1);
+            }
+		    top5.add(url);
 		}
-		
 
+    return top5;
 	}
 	
 

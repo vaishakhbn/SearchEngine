@@ -3,7 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-
+    <listener>
+        <listener-class>edu.uci.servlet.ResultServletContext</listener-class>
+    </listener>
     <servlet>
         <servlet-name>ResultServlet</servlet-name>
         <servlet-class>edu.uci.servlet.ResultServlet</servlet-class>

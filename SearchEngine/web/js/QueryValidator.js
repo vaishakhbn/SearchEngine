@@ -13,7 +13,10 @@ $("#srch-btn").click(function(){
         data:{qry:$('#txt-query').val()},
         success: function(response) {
             console.log("Success");
-            $("#results").append("<p>"+response.data+"</p>");
+            for(var resp in response.data){
+                $("#results").append("<a href="+response.data[resp]+">" + response.data[resp] + "<\a>");
+                $("#results").append("<br>");
+            }
         },
         error: function(xhr,err) {
             //Do Something to handle error
