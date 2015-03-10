@@ -14,7 +14,9 @@ $("#srch-btn").click(function(){
         success: function(response) {
             console.log("Success");
             for(var resp in response.data){
-                $("#results").append("<a href="+response.data[resp]+">" + response.data[resp] + "<\a>");
+                $("#results").append("<a href="+resp+">" + resp + "<\a>");
+                $("#results").append("<br>");
+                $("#results").append("<p>"+ response.data[resp] + "<\p>");
                 $("#results").append("<br>");
             }
         },

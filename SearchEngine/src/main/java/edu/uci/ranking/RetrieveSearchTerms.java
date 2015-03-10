@@ -1,9 +1,8 @@
 package edu.uci.ranking;
+import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
+
 import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -12,14 +11,24 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import edu.uci.index.Porter;
- 
+import edu.uci.text.processing.Token;
+import edu.uci.text.processing.Utilities;
+import org.json.simple.parser.ParseException;
+
 public class RetrieveSearchTerms {
-	public static void main(String args[]) throws UnknownHostException
+	private String query ="";
+    private MongoClient mongo;
+    private DB db;
+    public RetrieveSearchTerms() throws UnknownHostException {
+        mongo = new MongoClient("localhost");
+        db = mongo.getDB("Icsmr");
+    }
+    public static void main(String args[]) throws UnknownHostException
 	{
         //retrieveResults(args);
 	}
 
-    public List<String> retrieveResults(String[] args) throws UnknownHostException {
+    public Map<String, String> retrieveResults(String[] args) throws IOException, ParseException {
         if(args.length<1)
         {
             System.out.println("Query format : ");
@@ -28,24 +37,24 @@ public class RetrieveSearchTerms {
         for (int i = 0; i < args.length; i++) {
             result.append( args[i]+" ");
         }
-        String query = result.toString();
-        Porter p = new Porter();
+        query = result.toString();
+        return queryTerm(getStems(query));
+    }
 
+    private ArrayList<String> getStems(String query) {
         StringTokenizer st = new StringTokenizer(query);
-        ArrayList<DBObject> dbObject = new ArrayList<DBObject>();
+        Porter p = new Porter();
         ArrayList<String> stemmedTerms = new ArrayList<String>();
         while(st.hasMoreElements())
         {
             stemmedTerms.add(p.stripAffixes(st.nextToken()));
         }
-        return queryTerm(stemmedTerms);
-
+        return stemmedTerms;
     }
 
-    private List<String> queryTerm(ArrayList<String> stemmedTerms) throws UnknownHostException
-	{
-		MongoClient mongo = new MongoClient("localhost");
-		DB db = mongo.getDB("Icsmr");
+    private Map<String, String> queryTerm(ArrayList<String> stemmedTerms) throws IOException, ParseException {
+//        MongoClient mongo = new MongoClient("localhost");
+//        DB db = mongo.getDB("Icsmr");
 		DBCollection table = db.getCollection("tfidfaggr");
 		DBObject match = new BasicDBObject("$match", new BasicDBObject("_id", new BasicDBObject("$in",stemmedTerms.toArray())));
 		DBObject unwind = new BasicDBObject("$unwind", "$postings" );
@@ -65,18 +74,57 @@ public class RetrieveSearchTerms {
 		List<DBObject> pipeline = Arrays.asList(match, unwind, project, group, sort,limit);
 		AggregationOutput output = table.aggregate(pipeline);
         List<String> top5 = new ArrayList<String>();
+        Map<String,String> resultMap = new HashMap<String,String>();
 		for (DBObject result : output.results()) {
 		    System.out.println(result);
             String url = String.valueOf(result.get("_id"));
+            String snippet = procureSnippet(url,query);
             if(url.charAt(url.length()-1) == '/'){
                 url =url.substring(0,url.length()-1);
             }
 		    top5.add(url);
-		}
+            resultMap.put(url,snippet);
+        }
 
-    return top5;
+    return resultMap;
 	}
-	
+
+    private String procureSnippet(String url, String query) throws IOException, ParseException {
+        String snippet = "";
+        String[] qterms = query.split(" ");
+        DBCollection docs = db.getCollection("docs");
+        BasicDBObject param = new BasicDBObject();
+        param.put("url",url);
+        DBObject urlDoc = docs.findOne(param);
+        String docText = (String) urlDoc.get("text");
+        List<String> words = tokenizeText(docText);
+        int firstIndex = words.indexOf(qterms[0]);
+        //int lastIndex = words.lastIndexOf(qterms[0]);
+        if(firstIndex!=-1){
+            for(String snips : words.subList(firstIndex,firstIndex+8)){
+                snippet+=snips;
+                snippet+=" ";
+            }
+            snippet+="...";
+        }
+        return snippet;
+    }
+
+    private List<String> tokenizeText(String docText) {
+        List<String> input = new ArrayList<>();
+        String alphaNumericOnly = docText.replaceAll("[^a-zA-Z0-9,-\\./:]+"," ");
+        StringTokenizer st = new StringTokenizer(alphaNumericOnly);
+        while(st.hasMoreTokens())
+        {
+            String a = st.nextToken();
+            if(!(a.equalsIgnoreCase(" ")))
+            {
+                input.add(a.toLowerCase());
+            }
+        }
+        return input;
+    }
+
 
 }
 
