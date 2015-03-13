@@ -50,3 +50,4 @@ SearchEngine/.classpath
 *.json
 *.txt
 *.txt
+*.classpath

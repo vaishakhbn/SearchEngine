@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -18,7 +19,7 @@ public class MyCrawler extends WebCrawler {
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g"
                                                       + "|png|tiff?|mid|mp2|mp3|mp4"
                                                       + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
-                                                      + "|rm|smil|wmv|swf|wma|zip|rar|gz|xml))$");
+                                                      + "|rm|smil|wmv|swf|wma|zip|rar|gz|xml|java|cpp|csv))$");
 
     /**
      * You should implement this function to specify whether
@@ -38,7 +39,7 @@ public class MyCrawler extends WebCrawler {
             return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") &&!(href.contains("calendar")) &&
                     !(href.contains("archive.ics.uci.edu")) && !(href.contains("drzaius.ics.uci.edu"))&& !(href.contains("flamingo.ics.uci.edu")) &&
                     !(href.contains("fano.ics.uci.edu")) &&  !(href.contains("ironwood.ics.uci.edu")) &&
-                    !(href.contains("duttgroup.ics.uci.edu")) && !href.contains("wics.ics.uci.edu");
+                    !(href.contains("duttgroup.ics.uci.edu")) && !(href.contains("wics.ics.uci.edu")) && !(href.contains("blog/?feed=rss")) && !(href.contains("djp3-pc2.ics.uci.edu/"));
     }
 
     /**
@@ -56,6 +57,19 @@ public class MyCrawler extends WebCrawler {
                     HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
                     String text = htmlParseData.getText();
                     String html = htmlParseData.getHtml();
+                    String title = htmlParseData.getTitle();
+                  /*  StringTokenizer st = new StringTokenizer(url);
+                    String temp;
+                  */ ArrayList<String> tokenisedURL = new ArrayList<String>();
+                   /* while(st.hasMoreTokens())
+                    {
+                    	temp = st.nextToken();
+                    	if(!(temp.equalsIgnoreCase("ics")||temp.equalsIgnoreCase("uci")||temp.equalsIgnoreCase("edu")))
+                    	{
+                    		tokenisedURL.add(temp);
+                    	}
+                    }*/
+                    
                     List<WebURL> links = htmlParseData.getOutgoingUrls();
                     try {
                     	
@@ -72,6 +86,8 @@ public class MyCrawler extends WebCrawler {
 					}
                 PageDetails pageDetails = new PageDetails(url);
                 pageDetails.setText(text);
+                pageDetails.setTitle(title);
+               // pageDetails.setTokenizedURL(tokenisedURL);
                 pageDetails.setTextSize(text.length());
                 pageDetails.setSubDomain(subDomain);
                 ToJSON.getInstance().convert(pageDetails);

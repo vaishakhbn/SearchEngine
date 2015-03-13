@@ -10,11 +10,11 @@ public class Controller {
     public static void main(String[] args) throws Exception {
             /* Configuration of Crawler*/
             String crawlStorageFolder = "/data/crawl/root";
-            int numberOfCrawlers = 7;
+            int numberOfCrawlers = 20;
             
 
             CrawlConfig config = new CrawlConfig();
-            config.setPolitenessDelay(300);
+            config.setPolitenessDelay(20);
             config.setUserAgentString("UCI WebCrawler 57491291 41325543");
             config.setCrawlStorageFolder(crawlStorageFolder);
 

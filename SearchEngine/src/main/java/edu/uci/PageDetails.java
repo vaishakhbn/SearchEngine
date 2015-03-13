@@ -1,5 +1,7 @@
 package edu.uci;
 
+import java.util.ArrayList;
+
 /**
  * Created by swanand on 2/1/2015.
  */
@@ -8,7 +10,21 @@ public class PageDetails {
     private String subDomain;
     private int textSize;
     private String text;
-    public PageDetails(String url) {
+    private String title;
+    private ArrayList<String> tokenizedURL;
+	public ArrayList<String> getTokenizedURL() {
+		return tokenizedURL;
+	}
+	public void setTokenizedURL(ArrayList<String> tokenisedURL) {
+		this.tokenizedURL = tokenisedURL;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public PageDetails(String url) {
         this.url = url;
     }
     public String getURL()
