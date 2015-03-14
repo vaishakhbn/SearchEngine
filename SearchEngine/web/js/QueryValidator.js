@@ -3,6 +3,27 @@
  */
 $(document).ready(function() {
 
+var presentResults = function(resp){
+
+    $.ajax({
+        type: 'GET',
+        url: resp.url + '&callback=?',
+        success: function(data){
+            var title = data.responseText.match(/<title|TITLE>(.*?)<\/title|\/TITLE>/);
+            if(title === null){
+
+                title = resp.url;
+            }
+            $("#results").append("<a href="+resp.url+">" + title + "<\a>");
+            $("#results").append("<br>");
+            $("#results").append("<p>"+ resp.snippet + "<\p>");
+            $("#results").append("<br>");
+        },
+        error: function(xhr,err) {
+            return resp.url;
+        }
+   });
+}
 
 $("#srch-btn").click(function(){
     //Check if it's not empty
@@ -13,12 +34,9 @@ $("#srch-btn").click(function(){
         data:{qry:$('#txt-query').val()},
         success: function(response) {
             console.log("Success");
-            for(var resp in response.data){
-                $("#results").append("<a href="+resp+">" + resp + "<\a>");
-                $("#results").append("<br>");
-                $("#results").append("<p>"+ response.data[resp] + "<\p>");
-                $("#results").append("<br>");
-            }
+            response.data.forEach(function(resp){
+                presentResults(resp);
+            });
         },
         error: function(xhr,err) {
             //Do Something to handle error
