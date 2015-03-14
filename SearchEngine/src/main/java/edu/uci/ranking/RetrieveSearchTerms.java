@@ -31,7 +31,7 @@ public class RetrieveSearchTerms {
     	r.retrieveResults(args);
 	}
 
-    public Map<String, String> retrieveResults(String[] args) throws IOException, ParseException {
+    public List<SearchResult> retrieveResults(String[] args) throws IOException, ParseException {
         if(args.length<1)
         {
             System.out.println("Query format : ");
@@ -55,9 +55,9 @@ public class RetrieveSearchTerms {
         return stemmedTerms;
     }
 
-    private Map<String, String> queryTerm(ArrayList<String> stemmedTerms) throws IOException, ParseException {
-        MongoClient mongo = new MongoClient("localhost");
-        DB db = mongo.getDB("IcsmrFinal");
+    private List<SearchResult> queryTerm(ArrayList<String> stemmedTerms) throws IOException, ParseException {
+//        MongoClient mongo = new MongoClient("localhost");
+//        DB db = mongo.getDB("Icsmr");
 		DBCollection table = db.getCollection("tfidfaggr");
 		DBObject match = new BasicDBObject("$match", new BasicDBObject("_id", new BasicDBObject("$in",stemmedTerms.toArray())));
 		DBObject unwind = new BasicDBObject("$unwind", "$postings" );
@@ -79,10 +79,12 @@ public class RetrieveSearchTerms {
 		List<DBObject> pipeline = Arrays.asList(match, unwind, project, group, sort,limit);
 		AggregationOutput output = table.aggregate(pipeline);
         List<String> top5 = new ArrayList<String>();
-        Map<String,String> resultMap = new HashMap<String,String>();
+        Map<String,SearchResult> resultMap = new HashMap<String,SearchResult>();
+        List<SearchResult> searchResults = new ArrayList<SearchResult>();
 		for (DBObject result : output.results()) {
 		    System.out.println(result);
             String url = String.valueOf(result.get("_id"));
+
            /* String snippet = procureSnippet(url,query);
             if(url.charAt(url.length()-1) == '/'){
                 url =url.substring(0,url.length()-1);
@@ -93,10 +95,11 @@ public class RetrieveSearchTerms {
             ArrayList<ArrayList<Integer>> positions = new ArrayList();
             positions = (ArrayList<ArrayList<Integer>>) result.get("pos");
             getPositionRanking(positions);
-           
+            SearchResult srch = procureSearchResult(url, query);
+            searchResults.add(srch);
         }
 
-    return resultMap;
+    return searchResults;
 	}
 
     private void getPositionRanking(ArrayList<ArrayList<Integer>> positions) {
@@ -143,7 +146,15 @@ public class RetrieveSearchTerms {
     		
 		
 	}
-	private String procureSnippet(String url, String query) throws IOException, ParseException {
+
+    private String getUrlWoTrailSlash(String url) {
+        if(url.charAt(url.length()-1) == '/'){
+            url =url.substring(0,url.length()-1);
+        }
+        return url;
+    }
+
+    private SearchResult procureSearchResult(String url, String query) throws IOException, ParseException {
         String snippet = "";
         String[] qterms = query.split(" ");
         DBCollection docs = db.getCollection("docs");
@@ -151,6 +162,10 @@ public class RetrieveSearchTerms {
         param.put("url",url);
         DBObject urlDoc = docs.findOne(param);
         String docText = (String) urlDoc.get("text");
+        String title = docText.split("\n")[0].replaceAll("[^a-zA-Z0-9]+", " ");
+        SearchResult srch = new SearchResult(getUrlWoTrailSlash(url));
+        srch.setTitle(title);
+
         List<String> words = tokenizeText(docText);
         int firstIndex = words.indexOf(qterms[0]);
         //int lastIndex = words.lastIndexOf(qterms[0]);
@@ -161,12 +176,15 @@ public class RetrieveSearchTerms {
             }
             snippet+="...";
         }
-        return snippet;
+        snippet = " ";
+        srch.setSnippet(snippet);
+        return srch;
     }
 
     private List<String> tokenizeText(String docText) {
-        List<String> input = new ArrayList<String>();
-        String alphaNumericOnly = docText.replaceAll("[^a-zA-Z0-9,-\\./:]+"," ");
+
+        List<String> input = new ArrayList<>();
+        String alphaNumericOnly = docText.replaceAll("[^a-zA-Z0-9,-\\./:@]+"," ");
         StringTokenizer st = new StringTokenizer(alphaNumericOnly);
         while(st.hasMoreTokens())
         {
