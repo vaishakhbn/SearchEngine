@@ -42,14 +42,14 @@ public class ResultServlet extends HttpServlet {
             String queryString = request.getQueryString();
             String qry = request.getParameter("qry");
             String[] queryArr = qry.split(" ");
-            List<SearchResult> results = retriever.retrieveResults(queryArr);
-            for(SearchResult res: results){
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("url",res.getUrl());
-                jsonObject.put("title",res.getTitle());
-                jsonObject.put("snippet",res.getSnippet());
-                resList.add(jsonObject);
-            }
+//            List<SearchResult> results = retriever.retrieveResults(queryArr);
+//            for(SearchResult res: results){
+//                JSONObject jsonObject = new JSONObject();
+//                jsonObject.put("url",res.getUrl());
+//                jsonObject.put("title",res.getTitle());
+//                jsonObject.put("snippet",res.getSnippet());
+//                resList.add(jsonObject);
+//            }
             System.out.println(queryString + qry);
             json.put("data",resList);
             response.setContentType("application/json");

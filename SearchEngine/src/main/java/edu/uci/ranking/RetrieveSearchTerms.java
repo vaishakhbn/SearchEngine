@@ -31,7 +31,7 @@ public class RetrieveSearchTerms {
     	r.retrieveResults(args);
 	}
 
-    public List<SearchResult> retrieveResults(String[] args) throws IOException, ParseException {
+    public List<String> retrieveResults(String[] args) throws IOException, ParseException {
         if(args.length<1)
         {
             System.out.println("Query format : ");
@@ -55,7 +55,7 @@ public class RetrieveSearchTerms {
         return stemmedTerms;
     }
 
-    private List<SearchResult> queryTerm(ArrayList<String> stemmedTerms) throws IOException, ParseException {
+    private List<String> queryTerm(ArrayList<String> stemmedTerms) throws IOException, ParseException {
 //        MongoClient mongo = new MongoClient("localhost");
 //        DB db = mongo.getDB("Icsmr");
 		DBCollection table = db.getCollection("tfidfaggr");
@@ -75,77 +75,40 @@ public class RetrieveSearchTerms {
 		DBObject sortFields = new BasicDBObject("num",-1);
 		sortFields.put("score", -1);
 		DBObject sort = new BasicDBObject("$sort", sortFields);
-		DBObject limit = new BasicDBObject("$limit",500);
+		DBObject limit = new BasicDBObject("$limit",50);
 		List<DBObject> pipeline = Arrays.asList(match, unwind, project, group, sort,limit);
 		AggregationOutput output = table.aggregate(pipeline);
-        List<String> top5 = new ArrayList<String>();
         Map<String,SearchResult> resultMap = new HashMap<String,SearchResult>();
         List<SearchResult> searchResults = new ArrayList<SearchResult>();
-		for (DBObject result : output.results()) {
-		    System.out.println(result);
-            String url = String.valueOf(result.get("_id"));
-
-           /* String snippet = procureSnippet(url,query);
-            if(url.charAt(url.length()-1) == '/'){
-                url =url.substring(0,url.length()-1);
-            }
-		    top5.add(url);
-            resultMap.put(url,snippet);
-            */
-            ArrayList<ArrayList<Integer>> positions = new ArrayList();
-            positions = (ArrayList<ArrayList<Integer>>) result.get("pos");
-            getPositionRanking(positions);
-            SearchResult srch = procureSearchResult(url, query);
-            searchResults.add(srch);
+        Scorer scorer = new Scorer();
+        Map<String, Double> scoredUrls = scorer.score(output.results(), query);
+        List<String> top5 = new ArrayList<String>();
+        int count =0;
+        for(Map.Entry<String,Double> entry: scoredUrls.entrySet()){
+            top5.add(entry.getKey());
+            count++;
+            if(count>4) break;
         }
 
-    return searchResults;
+//        for (DBObject result : output.results()) {
+//		    System.out.println(result);
+//            String url = String.valueOf(result.get("_id"));
+//
+//           /* String snippet = procureSnippet(url,query);
+//            if(url.charAt(url.length()-1) == '/'){
+//                url =url.substring(0,url.length()-1);
+//            }
+//		    top5.add(url);
+//            resultMap.put(url,snippet);
+//            */
+//            SearchResult srch = procureSearchResult(url, query);
+//            searchResults.add(srch);
+//        }
+
+    return top5;
 	}
 
-    private void getPositionRanking(ArrayList<ArrayList<Integer>> positions) {
-    	if(positions.size()>2)
-    	{
-    		
-    	}
-    	else if(positions.size()==1)
-    	{
-    		if(positions.get(0).get(0)>300)
-    			System.out.println("Less ranking");
-    		else
-    			System.out.println("More ranking");
-    	}
-    	else
-    	{
-    		ArrayList<Integer> second;
-    		ArrayList<Integer> first;
-    		ArrayList<Integer> delta = new ArrayList<Integer>();
-    		/*if( positions.get(0).size()<positions.get(1).size())
-    		{
-    			second = new ArrayList<Integer>(positions.get(1).subList(0, positions.get(0).size()));
-    			first = positions.get(0);
-    		}
-    		else
-    		{
-    			second = new ArrayList<Integer>(positions.get(0).subList(0, positions.get(1).size()));
-    			first = positions.get(1);
-    		}*/
-    		for(int i = 0; i < Math.min(positions.get(0).size(),positions.get(1).size()); i++)
-    		{
-    			delta.add(Math.abs(positions.get(0).get(i)-positions.get(1).get(i)));
-    		}
-    		int sum = 0;
-    		for(int i : delta)
-    			sum+=i;
-    		sum=sum/delta.size();
-    		if(Math.min(positions.get(0).get(0),positions.get(0).get(1))>300)
-    			System.out.println("Not in the heading");
-    		else
-    			System.out.println("In the heading");
-    		System.out.println("The sum of the delta's is " +sum);
-    	}
-    		
-		
-	}
+
 
     private String getUrlWoTrailSlash(String url) {
         if(url.charAt(url.length()-1) == '/'){
