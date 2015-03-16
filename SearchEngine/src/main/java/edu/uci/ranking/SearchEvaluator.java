@@ -24,22 +24,17 @@ public class SearchEvaluator {
         for(String query : queries){
             String[] que = new String[]{query};
             googQueryResults.add(googleSearcher.getSearchResults(query, 5));
-            icsQueryResults.add(retr.retrieveResults(que));
+            icsQueryResults.add(retr.getTop5UrlsForNdcg(que));
         }
-//        List<List<String>> icsResults = new ArrayList<>();
-//
-//        for(List<SearchResult> srch : icsQueryResults){
-//            List<String> queRes = new ArrayList<>();
-//            for(SearchResult sres: srch){
-//                String url = sres.getUrl();
-//                queRes.add(url);
-//            }
-//            icsResults.add(queRes);
-//        }
+
         List<Double>ndcgs = new ArrayList<>();
         for(int i=0;i<icsQueryResults.size();i++){
             ndcgs.add(ndcg.getNDCG(icsQueryResults.get(i),googQueryResults.get(i),5));
         }
-        System.out.println("The query results should be: " + googQueryResults.size());
+        int i=0;
+        for(double n : ndcgs){
+            System.out.println("For query: " + queries.get(i)+" : "+n);
+            i++;
+        }
     }
 }

@@ -6,17 +6,29 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="js/jquery.xdomainajax.js"></script>
     <script src="js/QueryValidator.js"></script>
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
 <h2 style="text-align:center">Welcome to IcsSearch</h2>
-<div class="box-middle" style="text-align:center;margin: 100px auto;height:300px;width:300px;">
+<div class="box-middle" style="text-align:center;margin: 20px auto;height:150px;width:300px;">
     <input id="txt-query" type="text" name="query"><br><br>
-    <input id="srch-btn" autocomplete="on" type="submit" value="Search">
-
+    <button id="srch-btn" type="button" class="btn btn-info btn-lg">
+        <span class="glyphicon glyphicon-search"></span> Search
+    </button>
+    <!--<input class="srch-btn" autocomplete="on" type="submit" value="Search">-->
 </div>
-<div id="results" style="text-align:center;">
 
+<div id=spinner align="center">
+    <img src="loader.gif"/>
+</div>
+
+<div class="container">
+    <h4>Search Results: </h4><br>
+    <div class="jumbotron"style="text-align:center;">
+        <!--<div id="results" style="text-align:center;">
+        </div>-->
+    </div>
 </div>
 </body>
 </html>
