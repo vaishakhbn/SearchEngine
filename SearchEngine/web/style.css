@@ -1,0 +1,9 @@
+.jumbotron h1{
+    font-size: 2em;
+}
+
+.jumbotron p{
+    font-size: 1em;
+}
+
+body { background: lightgoldenrodyellow; }

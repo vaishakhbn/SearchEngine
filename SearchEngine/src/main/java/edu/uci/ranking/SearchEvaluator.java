@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by swanand on 3/13/2015.
- */
+* Created by swanand on 3/13/2015.
+*/
 public class SearchEvaluator {
 
     public static void main(String[] args) throws IOException, ParseException {
@@ -24,7 +24,21 @@ public class SearchEvaluator {
         for(String query : queries){
             String[] que = new String[]{query};
             googQueryResults.add(googleSearcher.getSearchResults(query, 5));
-            icsQueryResults.add(retr.retrieveResults(que));
+            icsQueryResults.add(toStringList(retr.retrieveResults(que)));
+        }
+        System.out.println("Google:");
+        for(List<String> goog : googQueryResults){
+            for(String go : goog){
+                System.out.println(go);
+            }
+            System.out.println("=====");
+        }
+        System.out.println("app");
+        for(List<String> ics : icsQueryResults){
+            for(String go : ics){
+                System.out.println(go);
+            }
+            System.out.println("=====");
         }
 //        List<List<String>> icsResults = new ArrayList<>();
 //
@@ -40,6 +54,19 @@ public class SearchEvaluator {
         for(int i=0;i<icsQueryResults.size();i++){
             ndcgs.add(ndcg.getNDCG(icsQueryResults.get(i),googQueryResults.get(i),5));
         }
-        System.out.println("The query results should be: " + googQueryResults.size());
+        int i=0;
+        for(Double n : ndcgs){
+
+            System.out.println("Ndcg values are:" + n + "for "+ queries.get(i++) );
+
+        }
+    }
+
+    private static List<String> toStringList(List<SearchResult> searchResults) {
+        List<String> resUrls = new ArrayList<String>();
+        for(SearchResult res : searchResults){
+            resUrls.add(res.getUrl());
+        }
+        return resUrls;
     }
 }
